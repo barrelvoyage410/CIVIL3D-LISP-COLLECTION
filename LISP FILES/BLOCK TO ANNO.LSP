@@ -1,0 +1,63 @@
+(defun c:banno ( / ucsf ch blocks bllst ss i ssent Block BlockName inspt rotang rotangd Xeffscf Yeffscf Zeffscf sssubents ans )
+
+  (vl-load-com)
+
+  (if (eq (getvar 'worlducs) 0)
+    (progn
+      (command "_.UCS" "_W")
+      (setq ucsf t)
+    )
+  )
+  (initget 1 "Annotative Non-annotative")
+  (setq ch
+    (getkword
+      "\nDo you want to make selected blocks Annotative or Non-annotative [A/N] : "
+    )
+  )
+  (setq blocks (vla-get-blocks (vla-get-activedocument (vlax-get-acad-object))))
+  (vlax-for bl blocks
+    (setq bllst (cons (list (vla-get-name bl) bl (vla-get-isxref bl)) bllst))
+  )
+  (prompt "\nSelect blocks with or without attributes that reside on unlocked layer(s)...")
+  (setq ss (ssget "_:L" '((0 . "INSERT"))))
+  (if ss
+    (repeat (setq i (sslength ss))
+      (setq ssent (ssname ss (setq i (1- i))))
+      (setq Block (vlax-ename->vla-object ssent))
+      (setq BlockName (vla-get-effectivename Block))
+      (setq inspt (vlax-safearray->list (vlax-variant-value (vla-get-insertionpoint Block))))
+      (setq rotang (vla-get-rotation Block))
+      (setq rotangd (* (/ 180 PI) rotang))
+      (setq Xeffscf (vla-get-Xeffectivescalefactor Block))
+      (setq Yeffscf (vla-get-Yeffectivescalefactor Block))
+      (setq Zeffscf (vla-get-Zeffectivescalefactor Block))
+      (if (and (assoc BlockName bllst) (eq (last (assoc BlockName bllst)) :vlax-false))
+        (vla-put-explodable (cadr (assoc BlockName bllst)) :vlax-true)
+      )
+      (command "_.EXPLODE" ssent)
+      (while (< 0 (getvar 'cmdactive))
+        (command "")
+      )
+      (setq sssubents (ssget "_P"))
+      (if (= ch "Annotative")
+        (progn
+          (setq ans "Yes")
+          (command "_.ROTATE" sssubents "" "_non" inspt (- rotangd))
+          (command "_.BLOCK" BlockName "_Y" "_A" ans "_N" "_non" inspt sssubents "")
+          (command "_.INSERT" BlockName "_non" inspt Xeffscf Yeffscf rotangd)
+        )
+        (progn
+          (setq ans "No")
+          (command "_.ROTATE" sssubents "" "_non" inspt (- rotangd))
+          (command "_.BLOCK" BlockName "_Y" "_A" ans "_N" "_non" inspt sssubents "")
+          (command "_.INSERT" BlockName "_non" inspt Xeffscf rotangd)
+        )
+      )
+    )
+    (prompt "\nEmpty sel.set... Retry routine with some blocks selected next time...")
+  )
+  (if ucsf
+    (command "_.UCS" "_P")
+  )
+  (princ)
+)
