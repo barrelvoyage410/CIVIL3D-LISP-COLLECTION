@@ -1,0 +1,34 @@
+-LAYER
+SET
+0
+FREEZE
+*_WORK*,*0_*,*1D*,*3D*,*4D*,*1E_MONUMENT*,*1E_BNDRY.*,*2E*,*ATR*,*BREAKLINES*,*FEATURELINES*,*3E*,*3P*
+FREEZE
+*1E_TREE.-.TEXT*,*1E_BOC.-.TEXT*,*1E_EP.-.TEXT*,*1E_STRIPE.-.TEXT*,*1E_EC.-.TEXT*,*1E_DIM*,*1P_PVMT*,*SETBACK*,*4E_STM.-.TEXT,*4P_STMTEXT*
+;Freeze layers not needed for your specific instance. if you freeze too many layers, be sure to use "thaw" command.
+THAW
+*3E_PEC*,*3E_FLOODPLAIN*,*3E_RIPRAP*,*3E_RETWALL*,*3E_WETLAND*,*3P_RETWALL*,*3P_NWL*,*3P_HWL*
+COLOR
+120
+*1E*,*3E*,*4E*
+COLOR
+2
+*1E_BNDRY
+COLOR
+70
+*4P_STM*
+COLOR
+7
+*4P_STMTEXT*,*4P_WMTEXT*,*SANTEXT*
+COLOR
+TRUECOLOR
+250,0,0
+*7REV#
+;RED
+()
+()
+
+
+;Semicolon (;) is used to create comments. These comments get skipped over during the run process.
+;Asterisk (*) is the wild card modifier. If before layer, then it will grab every layer that ends in your object (perfect for XREF layers)
+;Period (.) is used instead of spaces. Do NOT use a space because CAD thinks it is a return. EX: 1E_BNDRY.-.ADJ.TEXT
